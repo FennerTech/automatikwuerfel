@@ -1,0 +1,724 @@
+<!-- -----------------------------------------------
+
+Automatikwürfel
+(c) 2024 Marco Fenner
+
+Urheberrechtlich geschützt.
+Kopieren erlaubt.
+Verändern nur mit Namensnennung des Autors ;-)
+Danke und Viel Spaß!
+
+------------------------------------------------ -->
+
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatikwürfel</title>
+    <meta name="description" content="Entdecken Sie Automatikwürfel, ein spannendes Zero-Player-Game entwickelt von Marco Fenner. Spielen Sie jetzt unter https://fennertech.github.io/automatikwuerfel/">
+    <meta name="keywords" content="Zero-Player-Game, Automatikwürfel, Spiel, Automatenspiel, Fennertech, Würfelspiel">
+    <meta name="author" content="Marco Fenner">
+    <link rel="canonical" href="https://fennertech.github.io/automatikwuerfel/">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #333;
+        }
+
+        .cube {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #3498db;
+            top: 0;
+            border-radius: 2px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        #stats {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            border: 1px solid white;
+            width: 250px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 25px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid white;
+            margin: 10px 0;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #total-cubes {
+            font-size: 25px;
+            color: lightgreen;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        #clock {
+            font-size: 25px;
+            color: yellow;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            text-align: left;
+        }
+
+        .stat-value {
+            text-align: right;
+            min-width: 50px;
+        }
+
+        #level {
+            font-size: 25px;
+            /* Größe und Schriftart wie die Uhrzeit */
+            color: lightblue;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        #button-container {
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        button {
+            padding: 7px 14px;
+            /* Etwas größere Schriftgröße für Buttons */
+            font-size: 13px;
+            cursor: pointer;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            margin-right: 5px;
+            /* Abstand zwischen Buttons */
+        }
+
+        button:hover {
+            background-color: #777;
+        }
+
+        #visitor-counter {
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+        }
+
+        #cookie-notice {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #444;
+            color: white;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #cookie-notice p {
+            margin: 0;
+            padding: 0 10px;
+            font-size: 16px;
+        }
+
+        #cookie-buttons {
+            display: flex;
+        }
+
+        #cookie-buttons button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        #cookie-buttons button:hover {
+            background-color: #777;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            /* Versteckt das Modal standardmäßig */
+            position: fixed;
+            z-index: 1001;
+            /* Über dem Cookie-Hinweis anzeigen */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            /* Dunkler Hintergrund */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 83.33%;
+            /* 5/6 der Breite */
+            max-height: 70%;
+            overflow-y: auto;
+            /* Scrollbalken bei zu langem Inhalt */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            right: 10px;
+            top: 5px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="stats">
+            <div class="title">Automatikwürfel</div>
+            <div class="subtitle">Ein Zero-Player-Game</div>
+            <hr>
+            <div class="header-row">
+                <span id="total-cubes">0</span>
+                <span id="clock">00:00:00</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Level:</span>
+                <span class="stat-value" id="level">1</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Zeilen bis Level <span id="next-level">2</span>:</span>
+                <span class="stat-value" id="remaining-lines">10</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Zeilen:</span>
+                <span class="stat-value" id="lines-cleared">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Blaue Würfel:</span>
+                <span class="stat-value" id="blue-count">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Rote Würfel:</span>
+                <span class="stat-value" id="red-count">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Grüne Würfel:</span>
+                <span class="stat-value" id="green-count">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Seit Neustart:</span>
+                <span class="stat-value" id="time-since-reset">00:00:00</span>
+            </div>
+            <hr>
+            <div id="button-container">
+                <button id="reset-button">Reset</button>
+                <button id="impressum-button">Impressum</button>
+                <div id="visitor-counter">
+                    <a href='https://www.acadoo.de/masterarbeit-schreiben/'>Masterarbeit</a>
+                    <script type='text/javascript'
+                        src='https://www.fastcounter.net/auth.php?id=f54042b27f9ff1d56030c3554c08a3a87cb78ba6'></script>
+                    <script type="text/javascript"
+                        src="https://www.fast-counter.net/de/home/counter/1213619/t/4"></script>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close" id="closeModalBtn">&times;</span>
+                <h2>Impressum</h2>
+                <p><strong>Angaben gemäß § 5 TMG</strong></p>
+                <p><strong>Betreiber der Website:</strong><br>
+                    Marco Fenner<br>
+                    Wiardastraße 19<br>
+                    26603 Aurich<br>
+                    Deutschland</p>
+                <p><strong>Kontakt:</strong><br>
+                    E-Mail: <a href="mailto:datenschrauber@posteo.de">datenschrauber@posteo.de</a><br>
+                    Telefon: +49 1573 004 2105</p>
+                <p><strong>Vielen Dank für den Besuch meiner Website.<br>Wenn Sie Ihnen gefallen hat, würde ich mich über
+                        eine kurze Nachricht sehr freuen.</strong> 😊</p>
+
+                <h3>Haftungsausschluss:</h3>
+                <p><strong>Haftung für Inhalte</strong><br>
+                    Als Diensteanbieter bin ich gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den
+                    allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG bin ich als Diensteanbieter jedoch nicht
+                    verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen
+                    zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder
+                    Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine
+                    diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten
+                    Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werde ich diese
+                    Inhalte umgehend entfernen.</p>
+
+                <p><strong>Haftung für Links</strong><br>
+                    Mein Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte ich keinen Einfluss habe.
+                    Deshalb kann ich für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der
+                    verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die
+                    verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft.
+                    Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente
+                    inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer
+                    Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werde ich derartige Links
+                    umgehend entfernen.</p>
+
+                <p><strong>Urheberrecht</strong><br>
+                    Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem
+                    deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung
+                    außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors
+                    bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen
+                    Gebrauch gestattet. Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden
+                    die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet.
+                    Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitte ich um einen
+                    entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werde ich derartige Inhalte
+                    umgehend entfernen.</p>
+
+                <h3>Datenschutz:</h3>
+                <p>Die Nutzung meiner Webseite ist in der Regel ohne Angabe personenbezogener Daten möglich. Soweit auf
+                    meinen Seiten personenbezogene Daten (beispielsweise Name, Anschrift oder E-Mail-Adressen) erhoben
+                    werden, erfolgt dies, soweit möglich, stets auf freiwilliger Basis. Diese Daten werden ohne Ihre
+                    ausdrückliche Zustimmung nicht an Dritte weitergegeben. Ich weise darauf hin, dass die
+                    Datenübertragung im Internet (z.B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen
+                    kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.</p>
+
+                <h3>Hinweise zur lokalen Speicherung und Cookies:</h3>
+                <p>Diese Website speichert den Spielstand automatisch lokal im Browser. Der gespeicherte Spielstand kann
+                    durch das Löschen der Browserdaten entfernt werden.</p>
+                <p>Diese Seite enthält einen Besucherzähler von <a href="https://www.counter-zähler.de"
+                        target="_blank">Counter-Zähler.de</a>, der möglicherweise einen Cookie setzt. Weitere
+                    Informationen dazu finden Sie direkt auf <a href="https://www.counter-zähler.de" target="_blank">
+                        Counter-Zähler.de</a>.</p>
+
+                <h3>Einsehbarkeit des Quellcodes:</h3>
+                <p>Der Quellcode dieser Seite ist vollständig für jedermann einsehbar.</p>
+            </div>
+
+        </div>
+
+        <div id="cookie-notice">
+            <p>Diese Website verwendet Cookies, um die Benutzererfahrung zu verbessern. Bitte akzeptieren Sie unsere
+                Verwendung von Cookies.</p>
+            <div id="cookie-buttons">
+                <button id="accept-cookies">Annehmen</button>
+                <button id="decline-cookies">Ablehnen</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('container');
+        const clockElement = document.getElementById('clock');
+        const totalCubesElement = document.getElementById('total-cubes');
+        const levelElement = document.getElementById('level');
+        const nextLevelElement = document.getElementById('next-level');
+        const remainingLinesElement = document.getElementById('remaining-lines');
+        const blueCountElement = document.getElementById('blue-count');
+        const redCountElement = document.getElementById('red-count');
+        const greenCountElement = document.getElementById('green-count');
+        const linesClearedElement = document.getElementById('lines-cleared');
+        const timeSinceResetElement = document.getElementById('time-since-reset');
+        const resetButton = document.getElementById('reset-button');
+        const impressumButton = document.getElementById('impressum-button');
+        const cookieNotice = document.getElementById('cookie-notice');
+        const acceptCookiesButton = document.getElementById('accept-cookies');
+        const declineCookiesButton = document.getElementById('decline-cookies');
+
+        const modal = document.getElementById('modal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        const containerWidth = window.innerWidth;
+        const containerHeight = window.innerHeight;
+        const cubeSize = 20;
+        const maxColumnHeight = (2 / 3) * containerHeight;
+
+        let columnHeights = new Array(Math.floor(containerWidth / cubeSize)).fill(0);
+        let blueCount = 0;
+        let redCount = 0;
+        let greenCount = 0;
+        let totalCubes = 0;
+        let currentLevel = 1;
+        let linesForNextLevel = 10; // Lines required for the next level
+        let linesCleared = 0;
+        let startTime = new Date();
+
+        // Update clock and time since reset
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+
+            // Update time since reset
+            const elapsedTime = new Date(now - startTime);
+            const elapsedHours = String(elapsedTime.getUTCHours()).padStart(2, '0');
+            const elapsedMinutes = String(elapsedTime.getUTCMinutes()).padStart(2, '0');
+            const elapsedSeconds = String(elapsedTime.getUTCSeconds()).padStart(2, '0');
+            timeSinceResetElement.textContent = `${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}`;
+        }
+
+        function updateLevel() {
+            const requiredLinesForNextLevel = Math.floor(5 * Math.log(currentLevel + 1) + (currentLevel * 2));
+
+            if (linesCleared >= linesForNextLevel) {
+                currentLevel++;
+                levelElement.textContent = currentLevel.toLocaleString('de-DE');
+                linesForNextLevel += requiredLinesForNextLevel;
+                nextLevelElement.textContent = (currentLevel + 1).toLocaleString('de-DE');
+            }
+
+            const remainingLines = linesForNextLevel - linesCleared;
+            remainingLinesElement.textContent = remainingLines.toLocaleString('de-DE');
+        }
+
+        function createCube(x, y = 0, color) {
+            const cube = document.createElement('div');
+            cube.classList.add('cube');
+            cube.style.left = `${x}px`;
+            cube.style.top = `${y}px`;
+            cube.style.backgroundColor = color || '#3498db';
+
+            if (!color) {
+                const now = new Date();
+                const seconds = now.getSeconds();
+                const minutes = now.getMinutes();
+                if (minutes === 0 && seconds === 0) {
+                    cube.style.backgroundColor = '#7FFF00';
+                    greenCount++;
+                    greenCountElement.textContent = greenCount.toLocaleString('de-DE');
+                } else if (seconds === 0) {
+                    cube.style.backgroundColor = '#e74c3c';
+                    redCount++;
+                    redCountElement.textContent = redCount.toLocaleString('de-DE');
+                } else {
+                    cube.style.backgroundColor = '#3498db';
+                    blueCount++;
+                    blueCountElement.textContent = blueCount.toLocaleString('de-DE');
+                }
+            }
+
+            totalCubes++;
+            totalCubesElement.textContent = totalCubes.toLocaleString('de-DE');
+            updateLevel();
+
+            if (!color) animateCube(cube, Math.floor(x / cubeSize));
+
+            container.appendChild(cube);
+        }
+
+        function animateCube(cube, columnIndex) {
+            let positionY = parseInt(cube.style.top);
+            const gravity = 0.5;
+            let velocity = 0;
+
+            function fall() {
+                velocity += gravity;
+                positionY += velocity;
+
+                if (positionY + cubeSize >= containerHeight - columnHeights[columnIndex]) {
+                    positionY = containerHeight - columnHeights[columnIndex] - cubeSize;
+                    columnHeights[columnIndex] += cubeSize;
+
+                    if (columnHeights[columnIndex] >= maxColumnHeight) {
+                        clearColumn(columnIndex);
+                    }
+
+                    checkForFullRows();
+                } else {
+                    requestAnimationFrame(fall);
+                }
+
+                cube.style.top = `${positionY}px`;
+            }
+
+            requestAnimationFrame(fall);
+        }
+
+        function checkForFullRows() {
+            const rows = {};
+            const cubes = document.querySelectorAll('.cube');
+            cubes.forEach(cube => {
+                const y = parseInt(cube.style.top);
+                if (!rows[y]) {
+                    rows[y] = [];
+                }
+                rows[y].push(cube);
+            });
+
+            Object.keys(rows).forEach(y => {
+                if (rows[y].length === Math.floor(containerWidth / cubeSize)) {
+                    flashAndRemoveRow(parseInt(y), rows[y]);
+                }
+            });
+        }
+
+        function flashAndRemoveRow(y, rowCubes) {
+            const flashInterval = 100; // Time between flashes
+            const flashCount = 6; // Number of flashes
+
+            let flashes = 0;
+            const flashTimer = setInterval(() => {
+                if (flashes < flashCount) {
+                    rowCubes.forEach(cube => {
+                        cube.style.backgroundColor = getRandomColor();
+                    });
+                    flashes++;
+                } else {
+                    clearInterval(flashTimer);
+                    rowCubes.forEach(cube => {
+                        container.removeChild(cube);
+                    });
+
+                    linesCleared++;
+                    linesClearedElement.textContent = linesCleared.toLocaleString('de-DE');
+
+                    updateLevel();
+
+                    // Update column heights and move cubes down
+                    for (let i = 0; i < columnHeights.length; i++) {
+                        if (columnHeights[i] >= cubeSize) {
+                            columnHeights[i] -= cubeSize;
+                        }
+                    }
+
+                    // Move cubes above down
+                    const remainingCubes = document.querySelectorAll('.cube');
+                    remainingCubes.forEach(cube => {
+                        const cubeY = parseInt(cube.style.top);
+                        const cubeColumn = parseInt(cube.style.left) / cubeSize;
+                        if (cubeY < y) {
+                            cube.style.top = `${cubeY + cubeSize}px`;
+                        }
+                    });
+                }
+            }, flashInterval);
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function clearColumn(columnIndex) {
+            const cubes = document.querySelectorAll('.cube');
+            cubes.forEach(cube => {
+                if (parseInt(cube.style.left) === columnIndex * cubeSize) {
+                    container.removeChild(cube);
+                }
+            });
+
+            columnHeights[columnIndex] = 0;
+        }
+
+        function resetSimulation() {
+            const confirmation = confirm('Möchten Sie wirklich alle Würfel zurücksetzen und die Statistik auf Null setzen?');
+            if (confirmation) {
+                const cubes = document.querySelectorAll('.cube');
+                cubes.forEach(cube => container.removeChild(cube));
+
+                blueCount = 0;
+                redCount = 0;
+                greenCount = 0;
+                totalCubes = 0;
+                currentLevel = 1;
+                linesForNextLevel = 10;
+                linesCleared = 0;
+                startTime = new Date(); // Reset start time
+
+                blueCountElement.textContent = blueCount.toLocaleString('de-DE');
+                redCountElement.textContent = redCount.toLocaleString('de-DE');
+                greenCountElement.textContent = greenCount.toLocaleString('de-DE');
+                totalCubesElement.textContent = totalCubes.toLocaleString('de-DE');
+                levelElement.textContent = currentLevel.toLocaleString('de-DE');
+                nextLevelElement.textContent = (currentLevel + 1).toLocaleString('de-DE');
+                remainingLinesElement.textContent = linesForNextLevel.toLocaleString('de-DE');
+                linesClearedElement.textContent = linesCleared.toLocaleString('de-DE');
+                timeSinceResetElement.textContent = '00:00:00';
+
+                columnHeights = new Array(Math.floor(containerWidth / cubeSize)).fill(0);
+                saveState();
+            }
+        }
+
+        function saveState() {
+            const cubes = Array.from(document.querySelectorAll('.cube')).map(cube => {
+                const x = parseInt(cube.style.left);
+                const color = cube.style.backgroundColor;
+                const columnIndex = Math.floor(x / cubeSize);
+                const finalY = containerHeight - columnHeights[columnIndex] - cubeSize;
+                cube.style.top = `${finalY}px`;
+                columnHeights[columnIndex] += cubeSize;
+                return { x, y: finalY, color };
+            });
+
+            const state = {
+                cubes,
+                blueCount,
+                redCount,
+                greenCount,
+                totalCubes,
+                currentLevel,
+                linesForNextLevel,
+                linesCleared,
+                startTime: startTime.getTime()
+            };
+
+            localStorage.setItem('cubeState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem('cubeState');
+            if (!savedState) return;
+
+            const state = JSON.parse(savedState);
+
+            state.cubes.forEach(({ x, y, color }) => {
+                const columnIndex = Math.floor(x / cubeSize);
+                const stackHeight = columnHeights[columnIndex];
+                const adjustedY = containerHeight - stackHeight - cubeSize;
+                columnHeights[columnIndex] += cubeSize;
+                createCube(x, adjustedY, color);
+            });
+
+            blueCount = state.blueCount;
+            redCount = state.redCount;
+            greenCount = state.greenCount;
+            totalCubes = state.totalCubes;
+            currentLevel = state.currentLevel;
+            linesForNextLevel = state.linesForNextLevel;
+            linesCleared = state.linesCleared;
+            startTime = new Date(state.startTime);
+
+            blueCountElement.textContent = blueCount.toLocaleString('de-DE');
+            redCountElement.textContent = redCount.toLocaleString('de-DE');
+            greenCountElement.textContent = greenCount.toLocaleString('de-DE');
+            totalCubesElement.textContent = totalCubes.toLocaleString('de-DE');
+            levelElement.textContent = currentLevel.toLocaleString('de-DE');
+            nextLevelElement.textContent = (currentLevel + 1).toLocaleString('de-DE');
+            remainingLinesElement.textContent = (linesForNextLevel - linesCleared).toLocaleString('de-DE');
+            linesClearedElement.textContent = linesCleared.toLocaleString('de-DE');
+        }
+
+        window.addEventListener('beforeunload', saveState);
+        resetButton.addEventListener('click', resetSimulation);
+
+        impressumButton.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // Cookie-Banner Logik
+        const cookieAccepted = localStorage.getItem('cookiesAccepted');
+
+        if (cookieAccepted !== 'true') {
+            cookieNotice.style.display = 'flex';
+        } else {
+            cookieNotice.style.display = 'none';
+        }
+
+        acceptCookiesButton.addEventListener('click', () => {
+            localStorage.setItem('cookiesAccepted', 'true');
+            cookieNotice.style.display = 'none';
+        });
+
+        declineCookiesButton.addEventListener('click', () => {
+            alert('Sie haben den Zugang zur Website verweigert.');
+            window.location.href = 'https://www.google.com';
+        });
+
+        setTimeout(() => {
+            if (cookieNotice.style.display !== 'none') {
+                alert('Zeitüberschreitung: Sie haben den Zugang zur Website verweigert.');
+                window.location.href = 'https://www.google.com';
+            }
+        }, 120000); // 2 Minuten
+
+        loadState();
+        setInterval(updateClock, 1000);
+        setInterval(() => {
+            const randomColumn = Math.floor(Math.random() * (containerWidth / cubeSize));
+            createCube(randomColumn * cubeSize);
+        }, 1000);
+    </script>
+</body>
+
+</html>
+
