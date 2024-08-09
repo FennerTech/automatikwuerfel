@@ -55,7 +55,7 @@ Danke und Viel Spaß!
             font-size: 20px;
             color: white;
             z-index: 100;
-            background-color: #222; /* Undurchsichtige Hintergrundfarbe */
+            background-color: #222;
         }
 
         .title {
@@ -282,7 +282,7 @@ Danke und Viel Spaß!
 	<script language="JavaScript" src="https://www.besucherzaehler-kostenlos.de/js/counter.js.php?count=1&id=fennertech.github.ioautomatikwuerfel&start=0&design=6"></script>
     <div id="container">
         <div id="stats">
-            <div class="title">Automatikwürfel v2.09</div>
+            <div class="title">Automatikwürfel v2.18</div>
             <div class="subtitle">
                 <a href="mailto:datenschrauber@posteo.de">Ein Zero-Player-Game vom Datenschrauber</a>
             </div>
@@ -558,6 +558,7 @@ Danke und Viel Spaß!
                     }
 
                     checkForFullRows();
+
                 } else {
                     requestAnimationFrame(fall);
                 }
@@ -577,7 +578,6 @@ Danke und Viel Spaß!
                 }
             });
 
-            // Apply a dramatic removal animation
             cubesInColumn.forEach(cube => {
                 cube.style.animation = 'removeCubes 1s forwards';
             });
@@ -766,7 +766,18 @@ Danke und Viel Spaß!
                     const now = new Date();
                     const timeDiff = Math.floor((now - lastCubeTime) / 1000);
 
-                    for (let i = 0; i < timeDiff; i++) {
+                    if (timeDiff > 10) {
+                        const cubesToSimulate = timeDiff - 10;
+                        totalCubes += cubesToSimulate;
+                        blueCount += cubesToSimulate;
+                        blueCountElement.textContent = blueCount.toLocaleString('de-DE');
+                        totalCubesElement.textContent = totalCubes.toLocaleString('de-DE');
+
+                        for (let i = 0; i < 10; i++) {
+                            const randomColumn = Math.floor(Math.random() * (containerWidth / cubeSize));
+                            createCube(randomColumn * cubeSize);
+                        }
+                    } else {
                         const randomColumn = Math.floor(Math.random() * (containerWidth / cubeSize));
                         createCube(randomColumn * cubeSize);
                     }
