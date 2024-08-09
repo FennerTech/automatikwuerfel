@@ -42,6 +42,7 @@ Danke und Viel Spaß!
             top: 0;
             border-radius: 2px;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.3);
+            z-index: 1;
         }
 
         #stats {
@@ -53,6 +54,8 @@ Danke und Viel Spaß!
             width: 250px;
             font-size: 20px;
             color: white;
+            z-index: 100;
+            background-color: #222; /* Undurchsichtige Hintergrundfarbe */
         }
 
         .title {
@@ -66,6 +69,15 @@ Danke und Viel Spaß!
             text-align: center;
             font-size: 15px;
             margin-bottom: 10px;
+        }
+
+        .subtitle a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .subtitle a:hover {
+            text-decoration: underline;
         }
 
         hr {
@@ -109,9 +121,15 @@ Danke und Viel Spaß!
             min-width: 50px;
         }
 
+        .stat-row-b {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+            font-size: 17px;
+        }
+
         #level {
             font-size: 25px;
-            /* Größe und Schriftart wie die Uhrzeit */
             color: lightblue;
             font-weight: bold;
             text-align: right;
@@ -126,7 +144,6 @@ Danke und Viel Spaß!
 
         button {
             padding: 7px 14px;
-            /* Etwas größere Schriftgröße für Buttons */
             font-size: 13px;
             cursor: pointer;
             background-color: #555;
@@ -135,17 +152,10 @@ Danke und Viel Spaß!
             border-radius: 4px;
             transition: background-color 0.3s;
             margin-right: 5px;
-            /* Abstand zwischen Buttons */
         }
 
         button:hover {
             background-color: #777;
-        }
-
-        #visitor-counter {
-            font-size: 11px;
-            display: flex;
-            align-items: center;
         }
 
         #cookie-notice {
@@ -190,17 +200,14 @@ Danke und Viel Spaß!
         /* Modal Styles */
         .modal {
             display: none;
-            /* Versteckt das Modal standardmäßig */
             position: fixed;
             z-index: 1001;
-            /* Über dem Cookie-Hinweis anzeigen */
             left: 0;
             top: 0;
             width: 100%;
             height: 100%;
             overflow: auto;
             background-color: rgba(0, 0, 0, 0.4);
-            /* Dunkler Hintergrund */
             justify-content: center;
             align-items: center;
         }
@@ -210,10 +217,8 @@ Danke und Viel Spaß!
             padding: 20px;
             border: 1px solid #888;
             width: 83.33%;
-            /* 5/6 der Breite */
             max-height: 70%;
             overflow-y: auto;
-            /* Scrollbalken bei zu langem Inhalt */
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             position: relative;
         }
@@ -234,14 +239,53 @@ Danke und Viel Spaß!
             text-decoration: none;
             cursor: pointer;
         }
+
+        #clean-view-modal {
+            display: none;
+            position: fixed;
+            z-index: 1002;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 2px solid #888;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #visitor-counter {
+            background-color: #d3d3d3;
+            padding: 5px;
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        /* Animation for removing cubes */
+        @keyframes removeCubes {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 
 <body>
+	<script language="JavaScript" src="https://www.besucherzaehler-kostenlos.de/js/counter.js.php?count=1&id=fennertech.github.ioautomatikwuerfel&start=0&design=6"></script>
     <div id="container">
         <div id="stats">
-            <div class="title">Automatikwürfel</div>
-            <div class="subtitle">Ein Zero-Player-Game</div>
+            <div class="title">Automatikwürfel v2.09</div>
+            <div class="subtitle">
+                <a href="mailto:datenschrauber@posteo.de">Ein Zero-Player-Game vom Datenschrauber</a>
+            </div>
             <hr>
             <div class="header-row">
                 <span id="total-cubes">0</span>
@@ -276,16 +320,32 @@ Danke und Viel Spaß!
                 <span class="stat-value" id="time-since-reset">00:00:00</span>
             </div>
             <hr>
+	<!-- Besucherzähler -->
+	    <div class="stat-row-b">
+	    	<span class="stat-label">Besucher online:</span>
+		<span class="stat-value BZonline"></span>
+            </div>
+            <div class="stat-row-b">
+	    	<span class="stat-label">Besucher heute:</span>
+		<span class="stat-value BZheute"></span>
+            </div>
+            <div class="stat-row-b">
+	    	<span class="stat-label">Besucher gestern:</span>
+		<span class="stat-value BZgestern"></span>
+            </div>
+            <div class="stat-row-b">
+	    	<span class="stat-label">Besucher gesamt:</span>
+		<span class="stat-value BZgestern"></span>
+            </div>
+            <div class="stat-row-b">
+	    	<span class="stat-label">ZPG ist online seit:</span>
+		<span class="stat-value BZseit"></span>
+            </div>
+            <hr>
             <div id="button-container">
                 <button id="reset-button">Reset</button>
+                <button id="clean-button">schön</button>
                 <button id="impressum-button">Impressum</button>
-                <div id="visitor-counter">
-                    <a href='https://www.acadoo.de/masterarbeit-schreiben/'>Masterarbeit</a>
-                    <script type='text/javascript'
-                        src='https://www.fastcounter.net/auth.php?id=f54042b27f9ff1d56030c3554c08a3a87cb78ba6'></script>
-                    <script type="text/javascript"
-                        src="https://www.fast-counter.net/de/home/counter/1213619/t/4"></script>
-                </div>
             </div>
         </div>
 
@@ -346,18 +406,23 @@ Danke und Viel Spaß!
                     Datenübertragung im Internet (z.B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen
                     kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.</p>
 
-                <h3>Hinweise zur lokalen Speicherung und Cookies:</h3>
-                <p>Diese Website speichert den Spielstand automatisch lokal im Browser. Der gespeicherte Spielstand kann
-                    durch das Löschen der Browserdaten entfernt werden.</p>
-                <p>Diese Seite enthält einen Besucherzähler von <a href="https://www.counter-zähler.de"
-                        target="_blank">Counter-Zähler.de</a>, der möglicherweise einen Cookie setzt. Weitere
-                    Informationen dazu finden Sie direkt auf <a href="https://www.counter-zähler.de" target="_blank">
-                        Counter-Zähler.de</a>.</p>
+                <h3>Besucherzähler von besucherzaehler-kostenlos.de</h3>
+
+                <p>Diese Webseite verwendet einen externen Zähler, um die Anzahl der Webseitenaufrufe zu erfassen. Dafür wird ein Java-Script von einer externe Webseite geladen. Der Server von <a href="https://www.besucherzaehler-kostenlos.de">besucherzaehler-kostenlos.de</a> speichert die IP-Adresse des Zugriffs anonymisiert und zeitlich begrenzt in einer LOG-Datei ab. Diese wird regelmäßig unwiderruflich gelöscht.</p>
+
+                <p>Um die korrekte Funktionsweise des Zählers zu gewährleisten, speichert der Besucherzähler zudem einen sogenannten Session-Cookie auf dem Computer des Besuchers ab. Dieser wird in der Regel vom Browser gelöscht, sobald er geschlossen wird. In diesem Cookie werden keine persönlichen Informationen gespeichert. Er enthält lediglich die Information der aufgerufenen Domain, sowie einen boolschen Tag (true/false), um den Besucher als bereits gezählt zu markieren.</p>
+
+                <p>Es werden auch darüberhinaus keine persönlichen oder personenbezogenen Daten vom Besucherzähler erhoben. Eine Nachverfolgung oder Zuordnung der Zugriffe ist zu keiner Zeit möglich. Ein besonderer Dank geht an <a href="https://www.howtodocentral.com">www.howtodocentral.com</a>, durch dessen Unterstützung dieser kostenlose Service erst möglich gemacht wird.</p>
 
                 <h3>Einsehbarkeit des Quellcodes:</h3>
                 <p>Der Quellcode dieser Seite ist vollständig für jedermann einsehbar.</p>
             </div>
 
+        </div>
+
+        <!-- Clean View Modal -->
+        <div id="clean-view-modal">
+            <p>Ansicht wird bereinigt ...</p>
         </div>
 
         <div id="cookie-notice">
@@ -384,9 +449,11 @@ Danke und Viel Spaß!
         const timeSinceResetElement = document.getElementById('time-since-reset');
         const resetButton = document.getElementById('reset-button');
         const impressumButton = document.getElementById('impressum-button');
+        const cleanButton = document.getElementById('clean-button');
         const cookieNotice = document.getElementById('cookie-notice');
         const acceptCookiesButton = document.getElementById('accept-cookies');
         const declineCookiesButton = document.getElementById('decline-cookies');
+        const cleanViewModal = document.getElementById('clean-view-modal');
 
         const modal = document.getElementById('modal');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -402,9 +469,11 @@ Danke und Viel Spaß!
         let greenCount = 0;
         let totalCubes = 0;
         let currentLevel = 1;
-        let linesForNextLevel = 10; // Lines required for the next level
+        let linesForNextLevel = 10;
         let linesCleared = 0;
         let startTime = new Date();
+        let cubeInterval;
+        let lastCubeTime = new Date();
 
         // Update clock and time since reset
         function updateClock() {
@@ -414,9 +483,9 @@ Danke und Viel Spaß!
             const seconds = String(now.getSeconds()).padStart(2, '0');
             clockElement.textContent = `${hours}:${minutes}:${seconds}`;
 
-            // Update time since reset
             const elapsedTime = new Date(now - startTime);
-            const elapsedHours = String(elapsedTime.getUTCHours()).padStart(2, '0');
+            const elapsedDays = Math.floor(elapsedTime / (1000 * 60 * 60 * 24));
+            const elapsedHours = String(elapsedDays * 24 + elapsedTime.getUTCHours()).padStart(2, '0');
             const elapsedMinutes = String(elapsedTime.getUTCMinutes()).padStart(2, '0');
             const elapsedSeconds = String(elapsedTime.getUTCSeconds()).padStart(2, '0');
             timeSinceResetElement.textContent = `${elapsedHours}:${elapsedMinutes}:${elapsedSeconds}`;
@@ -485,7 +554,7 @@ Danke und Viel Spaß!
                     columnHeights[columnIndex] += cubeSize;
 
                     if (columnHeights[columnIndex] >= maxColumnHeight) {
-                        clearColumn(columnIndex);
+                        flashAndRemoveColumn(columnIndex);
                     }
 
                     checkForFullRows();
@@ -497,6 +566,28 @@ Danke und Viel Spaß!
             }
 
             requestAnimationFrame(fall);
+        }
+
+        function flashAndRemoveColumn(columnIndex) {
+            const cubesInColumn = [];
+            const cubes = document.querySelectorAll('.cube');
+            cubes.forEach(cube => {
+                if (parseInt(cube.style.left) === columnIndex * cubeSize) {
+                    cubesInColumn.push(cube);
+                }
+            });
+
+            // Apply a dramatic removal animation
+            cubesInColumn.forEach(cube => {
+                cube.style.animation = 'removeCubes 1s forwards';
+            });
+
+            setTimeout(() => {
+                cubesInColumn.forEach(cube => {
+                    container.removeChild(cube);
+                });
+                columnHeights[columnIndex] = 0;
+            }, 1000);
         }
 
         function checkForFullRows() {
@@ -518,8 +609,8 @@ Danke und Viel Spaß!
         }
 
         function flashAndRemoveRow(y, rowCubes) {
-            const flashInterval = 100; // Time between flashes
-            const flashCount = 6; // Number of flashes
+            const flashInterval = 100;
+            const flashCount = 6;
 
             let flashes = 0;
             const flashTimer = setInterval(() => {
@@ -539,14 +630,12 @@ Danke und Viel Spaß!
 
                     updateLevel();
 
-                    // Update column heights and move cubes down
                     for (let i = 0; i < columnHeights.length; i++) {
                         if (columnHeights[i] >= cubeSize) {
                             columnHeights[i] -= cubeSize;
                         }
                     }
 
-                    // Move cubes above down
                     const remainingCubes = document.querySelectorAll('.cube');
                     remainingCubes.forEach(cube => {
                         const cubeY = parseInt(cube.style.top);
@@ -592,7 +681,8 @@ Danke und Viel Spaß!
                 currentLevel = 1;
                 linesForNextLevel = 10;
                 linesCleared = 0;
-                startTime = new Date(); // Reset start time
+                startTime = new Date();
+                lastCubeTime = new Date();
 
                 blueCountElement.textContent = blueCount.toLocaleString('de-DE');
                 redCountElement.textContent = redCount.toLocaleString('de-DE');
@@ -629,7 +719,8 @@ Danke und Viel Spaß!
                 currentLevel,
                 linesForNextLevel,
                 linesCleared,
-                startTime: startTime.getTime()
+                startTime: startTime.getTime(),
+                lastCubeTime: lastCubeTime.getTime()
             };
 
             localStorage.setItem('cubeState', JSON.stringify(state));
@@ -657,6 +748,7 @@ Danke und Viel Spaß!
             linesForNextLevel = state.linesForNextLevel;
             linesCleared = state.linesCleared;
             startTime = new Date(state.startTime);
+            lastCubeTime = new Date(state.lastCubeTime);
 
             blueCountElement.textContent = blueCount.toLocaleString('de-DE');
             redCountElement.textContent = redCount.toLocaleString('de-DE');
@@ -666,6 +758,22 @@ Danke und Viel Spaß!
             nextLevelElement.textContent = (currentLevel + 1).toLocaleString('de-DE');
             remainingLinesElement.textContent = (linesForNextLevel - linesCleared).toLocaleString('de-DE');
             linesClearedElement.textContent = linesCleared.toLocaleString('de-DE');
+        }
+
+        function startCubeInterval() {
+            if (!cubeInterval) {
+                cubeInterval = setInterval(() => {
+                    const now = new Date();
+                    const timeDiff = Math.floor((now - lastCubeTime) / 1000);
+
+                    for (let i = 0; i < timeDiff; i++) {
+                        const randomColumn = Math.floor(Math.random() * (containerWidth / cubeSize));
+                        createCube(randomColumn * cubeSize);
+                    }
+
+                    lastCubeTime = now;
+                }, 1000);
+            }
         }
 
         window.addEventListener('beforeunload', saveState);
@@ -685,7 +793,14 @@ Danke und Viel Spaß!
             }
         });
 
-        // Cookie-Banner Logik
+        cleanButton.addEventListener('click', () => {
+            cleanViewModal.style.display = 'block';
+            setTimeout(() => {
+                cleanViewModal.style.display = 'none';
+                window.location.reload();
+            }, 1000);
+        });
+
         const cookieAccepted = localStorage.getItem('cookiesAccepted');
 
         if (cookieAccepted !== 'true') {
@@ -709,16 +824,13 @@ Danke und Viel Spaß!
                 alert('Zeitüberschreitung: Sie haben den Zugang zur Website verweigert.');
                 window.location.href = 'https://www.google.com';
             }
-        }, 120000); // 2 Minuten
+        }, 120000);
 
         loadState();
+        updateClock();
+        startCubeInterval();
         setInterval(updateClock, 1000);
-        setInterval(() => {
-            const randomColumn = Math.floor(Math.random() * (containerWidth / cubeSize));
-            createCube(randomColumn * cubeSize);
-        }, 1000);
     </script>
 </body>
 
 </html>
-
