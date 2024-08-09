@@ -282,7 +282,7 @@ Danke und Viel Spaß!
 	<script language="JavaScript" src="https://www.besucherzaehler-kostenlos.de/js/counter.js.php?count=1&id=fennertech.github.ioautomatikwuerfel&start=0&design=6"></script>
     <div id="container">
         <div id="stats">
-            <div class="title">Automatikwürfel v2.18</div>
+            <div class="title">Automatikwürfel v2.21</div>
             <div class="subtitle">
                 <a href="mailto:datenschrauber@posteo.de">Ein Zero-Player-Game vom Datenschrauber</a>
             </div>
@@ -335,7 +335,7 @@ Danke und Viel Spaß!
             </div>
             <div class="stat-row-b">
 	    	<span class="stat-label">Besucher gesamt:</span>
-		<span class="stat-value BZgestern"></span>
+		<span class="stat-value BZgesamt"></span>
             </div>
             <div class="stat-row-b">
 	    	<span class="stat-label">ZPG ist online seit:</span>
@@ -474,6 +474,7 @@ Danke und Viel Spaß!
         let startTime = new Date();
         let cubeInterval;
         let lastCubeTime = new Date();
+        let missedCubes = 0;
 
         // Update clock and time since reset
         function updateClock() {
@@ -534,6 +535,7 @@ Danke und Viel Spaß!
             totalCubes++;
             totalCubesElement.textContent = totalCubes.toLocaleString('de-DE');
             updateLevel();
+            updateTabTitle();
 
             if (!color) animateCube(cube, Math.floor(x / cubeSize));
 
@@ -683,6 +685,7 @@ Danke und Viel Spaß!
                 linesCleared = 0;
                 startTime = new Date();
                 lastCubeTime = new Date();
+                missedCubes = 0;
 
                 blueCountElement.textContent = blueCount.toLocaleString('de-DE');
                 redCountElement.textContent = redCount.toLocaleString('de-DE');
@@ -694,6 +697,7 @@ Danke und Viel Spaß!
                 linesClearedElement.textContent = linesCleared.toLocaleString('de-DE');
                 timeSinceResetElement.textContent = '00:00:00';
 
+                updateTabTitle();
                 columnHeights = new Array(Math.floor(containerWidth / cubeSize)).fill(0);
                 saveState();
             }
@@ -720,7 +724,8 @@ Danke und Viel Spaß!
                 linesForNextLevel,
                 linesCleared,
                 startTime: startTime.getTime(),
-                lastCubeTime: lastCubeTime.getTime()
+                lastCubeTime: lastCubeTime.getTime(),
+                missedCubes
             };
 
             localStorage.setItem('cubeState', JSON.stringify(state));
@@ -749,6 +754,7 @@ Danke und Viel Spaß!
             linesCleared = state.linesCleared;
             startTime = new Date(state.startTime);
             lastCubeTime = new Date(state.lastCubeTime);
+            missedCubes = state.missedCubes || 0;
 
             blueCountElement.textContent = blueCount.toLocaleString('de-DE');
             redCountElement.textContent = redCount.toLocaleString('de-DE');
@@ -758,6 +764,12 @@ Danke und Viel Spaß!
             nextLevelElement.textContent = (currentLevel + 1).toLocaleString('de-DE');
             remainingLinesElement.textContent = (linesForNextLevel - linesCleared).toLocaleString('de-DE');
             linesClearedElement.textContent = linesCleared.toLocaleString('de-DE');
+
+            updateTabTitle();
+        }
+
+        function updateTabTitle() {
+            document.title = `Würfel: ${totalCubes}`;
         }
 
         function startCubeInterval() {
@@ -767,17 +779,14 @@ Danke und Viel Spaß!
                     const timeDiff = Math.floor((now - lastCubeTime) / 1000);
 
                     if (timeDiff > 10) {
-                        const cubesToSimulate = timeDiff - 10;
-                        totalCubes += cubesToSimulate;
-                        blueCount += cubesToSimulate;
+                        missedCubes += timeDiff - 10;
+                        blueCount += timeDiff - 10;
+                        totalCubes += timeDiff - 10;
                         blueCountElement.textContent = blueCount.toLocaleString('de-DE');
                         totalCubesElement.textContent = totalCubes.toLocaleString('de-DE');
+                    }
 
-                        for (let i = 0; i < 10; i++) {
-                            const randomColumn = Math.floor(Math.random() * (containerWidth / cubeSize));
-                            createCube(randomColumn * cubeSize);
-                        }
-                    } else {
+                    for (let i = 0; i < Math.min(timeDiff, 10); i++) {
                         const randomColumn = Math.floor(Math.random() * (containerWidth / cubeSize));
                         createCube(randomColumn * cubeSize);
                     }
@@ -786,6 +795,12 @@ Danke und Viel Spaß!
                 }, 1000);
             }
         }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                startCubeInterval();
+            }
+        });
 
         window.addEventListener('beforeunload', saveState);
         resetButton.addEventListener('click', resetSimulation);
